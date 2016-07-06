@@ -183,8 +183,10 @@ namespace KoreanMalzahar
             {
                 Lane();
             }
+            
             //AutoHarass
-            AutoHarass();
+          if (Menu.Item("autoharass").GetValue<KeyBind>().Active)
+                AutoHarass();
         }
         private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero t, Interrupter2.InterruptableTargetEventArgs args)
         {
