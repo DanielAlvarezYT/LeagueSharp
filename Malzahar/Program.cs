@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,7 @@ using LeagueSharp.Common;
 using LeagueSharp.Data;
 using SharpDX;
 using Color = System.Drawing.Color;
+using SPrediction;
 
 namespace KoreanMalzahar
 {
@@ -204,7 +205,12 @@ namespace KoreanMalzahar
 
             if (t.IsValidTarget(Q.Range))
             {
-                Q.Cast(t);
+                var targeet = TargetSelector.GetTarget(
+                Q.Range,
+               TargetSelector.DamageType.Magical);
+                var pred = Q.GetSPrediction(targeet);
+                if (pred.HitChance >= HitChance.High);
+                    Q.Cast(pred.CastPosition);
             }
         }
 
