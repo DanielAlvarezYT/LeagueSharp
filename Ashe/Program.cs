@@ -97,8 +97,8 @@ namespace SurvivorAshe
             AutoLevelerMenu.AddItem(new MenuItem("AutoLvlStartFrom", "AutoLeveler Start from Level: ").SetValue(new Slider(2, 6, 1)));
 
             Menu SkinMenu = Menu.AddSubMenu(new Menu("Skins Menu", "SkinMenu"));
-            SkinMenu.AddItem(new MenuItem("SkinID", "Skin ID")).SetValue(new Slider(8, 0, 8));
-            var UseSkin = SkinMenu.AddItem(new MenuItem("UseSkin", "Enabled")).SetValue(true);
+
+            var UseSkin = new MenuItem("UseSkin", "Enabled").SetValue(true);
             UseSkin.ValueChanged += (sender, eventArgs) =>
             {
                 if (!eventArgs.GetNewValue<bool>())
@@ -106,7 +106,19 @@ namespace SurvivorAshe
                     ObjectManager.Player.SetSkin(ObjectManager.Player.CharData.BaseSkinName, ObjectManager.Player.BaseSkinId);
                 }
             };
-
+            
+            var SkinSlider = new MenuItem("SkinID", "Skin ID").SetValue(new Slider(8, 0, 8));
+            SkinSlider.ValueChanged += (sender, eventArgs) =>
+            {
+                if (Menu.Item("UseSkin").GetValue<bool>())
+                {
+                    ObjectManager.Player.SetSkin(Player.CharData.BaseSkinName, eventArgs.GetNewValue<Slider>().Value);
+                }
+            };
+            
+            SkinMenu.AddItem(UseSkin);
+            SkinMenu.AddItem(SkinSlider);
+            
             Menu DrawingMenu = Menu.AddSubMenu(new Menu("Drawing", "Drawing"));
             DrawingMenu.AddItem(new MenuItem("DrawAA", "Draw AA Range").SetValue(true));
             DrawingMenu.AddItem(new MenuItem("DrawW", "Draw W Range").SetValue(true));
@@ -290,11 +302,6 @@ namespace SurvivorAshe
         {
             if (Player.IsDead || Player.IsRecalling())
                 return;
-
-            if (Menu.Item("UseSkin").GetValue<bool>())
-            {
-                Player.SetSkin(Player.CharData.BaseSkinName, Menu.Item("SkinID").GetValue<Slider>().Value);
-            }
 
             switch (Orbwalker.ActiveMode)
             {
