@@ -230,6 +230,7 @@ namespace SurvivorMalzahar
                 Lane();
             }
             //AutoHarass
+            if (Menu.Item("autoharass").GetValue<bool>())
             AutoHarass();
         }
         private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero t, Interrupter2.InterruptableTargetEventArgs args)
