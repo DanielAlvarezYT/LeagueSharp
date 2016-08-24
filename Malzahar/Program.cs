@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ using SharpDX;
 using SPrediction;
 using SebbyLib;
 using Color = System.Drawing.Color;
+using SPrediction;
 
 namespace SurvivorMalzahar
 {
@@ -250,7 +251,12 @@ namespace SurvivorMalzahar
 
             if (t.IsValidTarget(Q.Range))
             {
-                Q.Cast(t);
+                var targeet = TargetSelector.GetTarget(
+                Q.Range,
+               TargetSelector.DamageType.Magical);
+                var pred = Q.GetSPrediction(targeet);
+                if (pred.HitChance >= HitChance.High);
+                    Q.Cast(pred.CastPosition);
             }
         }
 
