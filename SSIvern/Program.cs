@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs.cs" company="SSIvern">
 //      Copyright (c) SSIvern. All rights reserved.
 // </copyright>
@@ -347,7 +347,10 @@ namespace SSIvern
                 foreach (var hero in HeroManager.Allies)
                     if (Config.Item("EProtectionAlly." + hero.ChampionName).GetValue<bool>())
                         if (hero.Distance(Player.ServerPosition) <= E.Range)
-                            if (OktwCommon.GetIncomingDamage(hero, 2, true) > 0)
+                        {
+                            var damage = OktwCommon.GetIncomingDamage(hero, 2, true);
+                            //if damage is atleast 5 percent health of ally OR damage is less than our sheild + ally health
+                            if (damage > hero.MaxHealth * 0.05f || damage > hero.Health && damage < 40 + 40 * E.Level + 0.8 * Player.TotalMagicalDamage + hero.Health)
                             {
                                 E.CastOnUnit(hero);
                                 if (Config.Item("NotifyProtectedAlly").GetValue<bool>())
@@ -356,6 +359,7 @@ namespace SSIvern
                                             .SetTextColor(
                                                 System.Drawing.Color.Chartreuse));
                             }
+                        }
 
                 #region Useless Stuff
 
