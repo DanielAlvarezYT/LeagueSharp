@@ -6,6 +6,7 @@
 
 using System;
 using System.Drawing;
+using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using Color = SharpDX.Color;
@@ -21,42 +22,44 @@ namespace LeeBlockimateSharp
 
         private static void Game_OnGameLoad(EventArgs args)
         {
+            if (!WorkingChampions.Contains(Player.ChampionName.ToLower()))
+                return;
             #region Spells
 
             if (Player.ChampionName.ToLower() == "talon")
-                TalonR = new Spell(SpellSlot.R);
+                _talonR = new Spell(SpellSlot.R);
             if (Player.ChampionName.ToLower() == "vayne")
             {
-                VayneQ = new Spell(SpellSlot.Q);
-                VayneR = new Spell(SpellSlot.R);
+                _vayneQ = new Spell(SpellSlot.Q);
+                _vayneR = new Spell(SpellSlot.R);
             }
             if ((Player.ChampionName.ToLower() == "wukong") || (Player.ChampionName.ToLower() == "monkeyking"))
-                WukongW = new Spell(SpellSlot.W);
+                _wukongW = new Spell(SpellSlot.W);
             if (Player.ChampionName.ToLower() == "khazix")
-                KhaZixR = new Spell(SpellSlot.R);
+                _khaZixR = new Spell(SpellSlot.R);
             if (Player.ChampionName.ToLower() == "shaco")
-                ShacoQ = new Spell(SpellSlot.Q);
+                _shacoQ = new Spell(SpellSlot.Q);
 
             #endregion
 
             #region Menu
 
-            Menu = new Menu("LeeBlockimate#", "LeeBlockimateSharp", true).SetFontStyle(FontStyle.Bold, Color.Chartreuse);
+            _menu = new Menu("LeeBlockimate#", "LeeBlockimateSharp", true).SetFontStyle(FontStyle.Bold, Color.Chartreuse);
 
-            var Spells = Menu.AddSubMenu(new Menu("Spells", "Spells").SetFontStyle(FontStyle.Bold, Color.Chartreuse));
+            var spells = _menu.AddSubMenu(new Menu("Spells", "Spells").SetFontStyle(FontStyle.Bold, Color.Chartreuse));
             if (Player.ChampionName.ToLower() == "talon")
-                Spells.AddItem(
+                spells.AddItem(
                     new MenuItem("BlockWithTalonR", "Exploit with R").SetValue(true));
             if (Player.ChampionName.ToLower() == "vayne")
-                Spells.AddItem(new MenuItem("BlockWithVayneQR", "Exploit with Vayne Q/R").SetValue(true));
+                spells.AddItem(new MenuItem("BlockWithVayneQR", "Exploit with Vayne Q/R").SetValue(true));
             if ((Player.ChampionName.ToLower() == "wukong") || (Player.ChampionName.ToLower() == "monkeyking"))
-                Spells.AddItem(new MenuItem("BlockWithWukongW", "Exploit with Wukong W").SetValue(true));
+                spells.AddItem(new MenuItem("BlockWithWukongW", "Exploit with Wukong W").SetValue(true));
             if (Player.ChampionName.ToLower() == "khazix")
-                Spells.AddItem(new MenuItem("BlockWithKhaZixR", "Exploit with KhaZix R").SetValue(true));
+                spells.AddItem(new MenuItem("BlockWithKhaZixR", "Exploit with KhaZix R").SetValue(true));
             if (Player.ChampionName.ToLower() == "shaco")
-                Spells.AddItem(new MenuItem("BlockWithShacoQ", "Exploit with Shaco Q").SetValue(true));
+                spells.AddItem(new MenuItem("BlockWithShacoQ", "Exploit with Shaco Q").SetValue(true));
 
-            Menu.AddToMainMenu();
+            _menu.AddToMainMenu();
 
             #endregion
 
@@ -68,43 +71,80 @@ namespace LeeBlockimateSharp
 
             Game.PrintChat(
                 "<font color='#800040'>[Exploit] LeeBlockimateSharp</font> <font color='#ff6600'>Loaded.</font>");
-            Game.PrintChat("<font color='#CC0099'>[LeeBlockimateSharp] Will dodge (Lee Sin/Darius/Garen)'s Ult </font>");
+            Game.PrintChat("<font color='#7A6EFF'>[LeeBlockimateSharp] Will dodge (Lee Sin/Darius/Garen/Camille)'s Ult </font>");
+            Notifications.AddNotification(new Notification(Player.ChampionName+" Loaded!", 3500).SetTextColor(System.Drawing.Color.Chartreuse));
         }
 
-        public static void Obj_AI_Base_OnProcessSpell(Obj_AI_Base enemy, GameObjectProcessSpellCastEventArgs Spell)
+        public static void Obj_AI_Base_OnProcessSpell(Obj_AI_Base enemy, GameObjectProcessSpellCastEventArgs spell)
         {
             if (enemy.IsMe)
                 return;
             if (enemy.IsChampion() && enemy.IsEnemy)
-                if ((Spell.SData.Name == "BlindMonkRKick") || (Spell.SData.DisplayName == "BlindMonkRKick") ||
-                    (Spell.SData.Name == "GarenR") || (Spell.SData.DisplayName == "GarenR") ||
-                    (Spell.SData.Name == "DariusExecute") ||
-                    ((Spell.SData.DisplayName == "DariusExecute") && (Spell.Target == Player)))
+                if ((BlockSpells.Contains(spell.SData.Name) || BlockSpells.Contains(spell.SData.DisplayName)) &&
+                    (spell.Target == Player))
                     switch (Player.ChampionName.ToLower())
                     {
                         case "talon":
-                            if (Menu.Item("BlockiWithTalonR").GetValue<bool>())
-                                TalonR.Cast();
+                            if (_menu.Item("BlockiWithTalonR").GetValue<bool>())
+                            {
+                                _talonR.Cast();
+                                if (!Player.HasBuffOfType(BuffType.Silence))
+                                    Notifications.AddNotification(
+                                        new Notification("Successfully blocked with (R)", 3000).SetTextColor(
+                                            System.Drawing.Color.Chartreuse));
+                                else
+                                    Notifications.AddNotification(
+                                        new Notification("Silenced couldn't block with (R)", 3000).SetTextColor(
+                                            System.Drawing.Color.Red));
+                            }
                             break;
                         case "vayne":
-                            if (Menu.Item("BlockWithVayneQR").GetValue<bool>())
+                            if (_menu.Item("BlockWithVayneQR").GetValue<bool>())
                             {
-                                VayneR.Cast();
-                                VayneQ.Cast(Game.CursorPos);
+                                _vayneR.Cast();
+                                _vayneQ.Cast(Game.CursorPos);
+                                if (!Player.HasBuffOfType(BuffType.Silence))
+                                    Notifications.AddNotification(
+                                        new Notification("Successfully blocked with (R+Q)", 3000).SetTextColor(
+                                            System.Drawing.Color.Chartreuse));
+                                else
+                                    Notifications.AddNotification(
+                                        new Notification("Silenced couldn't block with (R+Q)", 3000).SetTextColor(
+                                            System.Drawing.Color.Red));
                             }
                             break;
                         case "wukong":
-                            if (Menu.Item("BlockWithWukongW").GetValue<bool>())
-                                WukongW.Cast();
+                            if (_menu.Item("BlockWithWukongW").GetValue<bool>())
+                            {
+                                _wukongW.Cast();
+                                if (!Player.HasBuffOfType(BuffType.Silence))
+                                    Notifications.AddNotification(
+                                        new Notification("Successfully blocked with (W)", 3000).SetTextColor(
+                                            System.Drawing.Color.Chartreuse));
+                                else
+                                    Notifications.AddNotification(
+                                        new Notification("Silenced couldn't block with (W)", 3000).SetTextColor(
+                                            System.Drawing.Color.Red));
+                            }
                             break;
                         case "monkeyking":
-                            if (Menu.Item("BlockWithWukongW").GetValue<bool>())
-                                WukongW.Cast();
+                            if (_menu.Item("BlockWithWukongW").GetValue<bool>())
+                            {
+                                _wukongW.Cast();
+                                if (!Player.HasBuffOfType(BuffType.Silence))
+                                    Notifications.AddNotification(
+                                        new Notification("Successfully blocked with (W)", 3000).SetTextColor(
+                                            System.Drawing.Color.Chartreuse));
+                                else
+                                    Notifications.AddNotification(
+                                        new Notification("Silenced couldn't block with (W)", 3000).SetTextColor(
+                                            System.Drawing.Color.Red));
+                            }
                             break;
                         case "khazix":
-                            if (Menu.Item("BlockWithKhaZixR").GetValue<bool>())
+                            if (_menu.Item("BlockWithKhaZixR").GetValue<bool>())
                             {
-                                KhaZixR.Cast();
+                                _khaZixR.Cast();
                                 if (!Player.HasBuffOfType(BuffType.Silence))
                                     Notifications.AddNotification(
                                         new Notification("Successfully blocked with (R)", 3000).SetTextColor(
@@ -116,17 +156,29 @@ namespace LeeBlockimateSharp
                             }
                             break;
                         case "shaco":
-                            if (Menu.Item("BlockWithShacoQ").GetValue<bool>())
-                                ShacoQ.Cast(Game.CursorPos);
+                            if (_menu.Item("BlockWithShacoQ").GetValue<bool>())
+                            {
+                                _shacoQ.Cast(Game.CursorPos);
+                                if (!Player.HasBuffOfType(BuffType.Silence))
+                                    Notifications.AddNotification(
+                                        new Notification("Successfully blocked with (R)", 3000).SetTextColor(
+                                            System.Drawing.Color.Chartreuse));
+                                else
+                                    Notifications.AddNotification(
+                                        new Notification("Silenced couldn't block with (R)", 3000).SetTextColor(
+                                            System.Drawing.Color.Red));
+                            }
                             break;
                     }
         }
 
         #region Declaration
 
-        private static Spell TalonR, VayneQ, VayneR, WukongW, KhaZixR, ShacoQ;
-        private static Menu Menu;
+        private static Spell _talonR, _vayneQ, _vayneR, _wukongW, _khaZixR, _shacoQ;
+        private static Menu _menu;
         private static Obj_AI_Hero Player => ObjectManager.Player;
+        private static readonly string[] BlockSpells = {"BlindMonkRKick", "GarenR", "DariusExecute", "CamilleR"};
+        private static readonly string[] WorkingChampions = {"talon", "khazix", "leesin", "wukong", "monkeyking", "vayne", "shaco"};
 
         #endregion
     }
