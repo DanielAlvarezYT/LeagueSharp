@@ -103,7 +103,19 @@ namespace LeeBlockimateSharp
                             break;
                         case "khazix":
                             if (Menu.Item("BlockWithKhaZixR").GetValue<bool>())
+                            {
                                 KhaZixR.Cast();
+                                if (!Player.HasBuffOfType(BuffType.Silence))
+                                Notifications.AddNotification(
+                                    new Notification("Successfully blocked with (R)", 3000).SetTextColor(
+                                        System.Drawing.Color.Chartreuse));
+                                else
+                                {
+                                    Notifications.AddNotification(
+                                    new Notification("Silenced couldn't block with (R)", 3000).SetTextColor(
+                                        System.Drawing.Color.Red));
+                                }
+                            }
                             break;
                         case "shaco":
                             if (Menu.Item("BlockWithShacoQ").GetValue<bool>())
