@@ -30,7 +30,7 @@ namespace LeeBlockimateSharp
                 VayneQ = new Spell(SpellSlot.Q);
                 VayneR = new Spell(SpellSlot.R);
             }
-            if (Player.ChampionName.ToLower() == "wukong" || Player.ChampionName.ToLower() == "monkeyking")
+            if ((Player.ChampionName.ToLower() == "wukong") || (Player.ChampionName.ToLower() == "monkeyking"))
                 WukongW = new Spell(SpellSlot.W);
             if (Player.ChampionName.ToLower() == "khazix")
                 KhaZixR = new Spell(SpellSlot.R);
@@ -49,7 +49,7 @@ namespace LeeBlockimateSharp
                     new MenuItem("BlockWithTalonR", "Exploit with R").SetValue(true));
             if (Player.ChampionName.ToLower() == "vayne")
                 Spells.AddItem(new MenuItem("BlockWithVayneQR", "Exploit with Vayne Q/R").SetValue(true));
-            if (Player.ChampionName.ToLower() == "wukong" || Player.ChampionName.ToLower() == "monkeyking")
+            if ((Player.ChampionName.ToLower() == "wukong") || (Player.ChampionName.ToLower() == "monkeyking"))
                 Spells.AddItem(new MenuItem("BlockWithWukongW", "Exploit with Wukong W").SetValue(true));
             if (Player.ChampionName.ToLower() == "khazix")
                 Spells.AddItem(new MenuItem("BlockWithKhaZixR", "Exploit with KhaZix R").SetValue(true));
@@ -106,15 +106,13 @@ namespace LeeBlockimateSharp
                             {
                                 KhaZixR.Cast();
                                 if (!Player.HasBuffOfType(BuffType.Silence))
-                                Notifications.AddNotification(
-                                    new Notification("Successfully blocked with (R)", 3000).SetTextColor(
-                                        System.Drawing.Color.Chartreuse));
-                                else
-                                {
                                     Notifications.AddNotification(
-                                    new Notification("Silenced couldn't block with (R)", 3000).SetTextColor(
-                                        System.Drawing.Color.Red));
-                                }
+                                        new Notification("Successfully blocked with (R)", 3000).SetTextColor(
+                                            System.Drawing.Color.Chartreuse));
+                                else
+                                    Notifications.AddNotification(
+                                        new Notification("Silenced couldn't block with (R)", 3000).SetTextColor(
+                                            System.Drawing.Color.Red));
                             }
                             break;
                         case "shaco":
