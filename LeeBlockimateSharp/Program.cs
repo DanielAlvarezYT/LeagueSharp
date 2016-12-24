@@ -30,7 +30,7 @@ namespace LeeBlockimateSharp
                 VayneQ = new Spell(SpellSlot.Q);
                 VayneR = new Spell(SpellSlot.R);
             }
-            if (Player.ChampionName.ToLower() == "wukong")
+            if (Player.ChampionName.ToLower() == "wukong" || Player.ChampionName.ToLower() == "monkeyking")
                 WukongW = new Spell(SpellSlot.W);
             if (Player.ChampionName.ToLower() == "khazix")
                 KhaZixR = new Spell(SpellSlot.R);
@@ -49,7 +49,7 @@ namespace LeeBlockimateSharp
                     new MenuItem("BlockWithTalonR", "Exploit with R").SetValue(true));
             if (Player.ChampionName.ToLower() == "vayne")
                 Spells.AddItem(new MenuItem("BlockWithVayneQR", "Exploit with Vayne Q/R").SetValue(true));
-            if (Player.ChampionName.ToLower() == "wukong")
+            if (Player.ChampionName.ToLower() == "wukong" || Player.ChampionName.ToLower() == "monkeyking")
                 Spells.AddItem(new MenuItem("BlockWithWukongW", "Exploit with Wukong W").SetValue(true));
             if (Player.ChampionName.ToLower() == "khazix")
                 Spells.AddItem(new MenuItem("BlockWithKhaZixR", "Exploit with KhaZix R").SetValue(true));
@@ -94,6 +94,10 @@ namespace LeeBlockimateSharp
                             }
                             break;
                         case "wukong":
+                            if (Menu.Item("BlockWithWukongW").GetValue<bool>())
+                                WukongW.Cast();
+                            break;
+                        case "monkeyking":
                             if (Menu.Item("BlockWithWukongW").GetValue<bool>())
                                 WukongW.Cast();
                             break;
