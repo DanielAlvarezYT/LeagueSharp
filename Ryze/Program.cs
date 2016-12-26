@@ -16,9 +16,6 @@ using HitChance = SebbyLib.Prediction.HitChance;
 using Orbwalking = SebbyLib.Orbwalking;
 using PredictionInput = SebbyLib.Prediction.PredictionInput;
 
-// ReSharper disable ObjectCreationAsStatement
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
-
 namespace SurvivorRyze
 {
     internal class Program
@@ -35,21 +32,16 @@ namespace SurvivorRyze
 
             #region Spells
 
-            _q = new Spell(SpellSlot.Q, 1000f);
-            _q.SetSkillshot(0.7f, 55f, float.MaxValue, true, SkillshotType.SkillshotLine);
-            _w = new Spell(SpellSlot.W, 610f);
-            _w.SetTargetted(0.103f, 550f);
-            _e = new Spell(SpellSlot.E, 610f);
-            _e.SetTargetted(.5f, 550f);
+            _q = new Spell(SpellSlot.Q, 1000f, TargetSelector.DamageType.Magical);
+            _q.SetSkillshot(0.25f, 50f, 1700, true, SkillshotType.SkillshotLine);
+            _w = new Spell(SpellSlot.W, 600f, TargetSelector.DamageType.Magical);
+            _e = new Spell(SpellSlot.E, 600f, TargetSelector.DamageType.Magical);
             _r = new Spell(SpellSlot.R);
             _r.SetSkillshot(2.5f, 450f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             #endregion
 
             _igniteSlot = Player.GetSpellSlot("summonerdot");
-            new Items.Item(3070);
-            new Items.Item(3004);
-            new Items.Item(3003);
 
             #region Menu
 
@@ -346,7 +338,7 @@ namespace SurvivorRyze
 
         private static void Obj_AI_Base_OnLevelUp(Obj_AI_Base sender, EventArgs args)
         {
-            if (sender.IsMe && _menu.Item("Reminders").GetValue<bool>() && (ObjectManager.Player.Level >= 6))
+            if (sender.IsMe && _menu.Item("Reminders").GetValue<bool>() && (ObjectManager.Player.Level == 6))
                 GotStronger();
 
             if (!sender.IsMe || !_menu.Item("AutoLevelUp").GetValue<bool>() ||
@@ -988,6 +980,7 @@ namespace SurvivorRyze
                         _orbwalker.ForceTarget(ryzeebuffed);
                     }
                 }
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 else if (ryzeebuffed == null)
                 {
                     foreach (var minion in allMinions)
